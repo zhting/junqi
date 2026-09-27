@@ -944,7 +944,7 @@ async function submitDeploy() {
 }
 
 // ================= 对战 =================
-const BT = { mid: null, sel: null, pop: null, marks: {}, duel: null, duelT: 0, pending: false, review: false, anim: null, lastTick: -1 };
+const BT = { mid: null, sel: null, pop: null, marks: {}, duelT: 0, pending: false, review: false, anim: null, lastTick: -1 };
 const CH = { win: ['胜', 'c-jade'], lose: ['阵亡', 'c-red'], repel: ['击退', 'c-jade'], both: ['同归', 'c-violet'], flag: ['夺旗', 'c-yellow'], warn: ['注意', 'c-yellow'] };
 const CH_SYS = { win: ['胜利', 'c-jade'], lose: ['失败', 'c-red'], both: ['和棋', 'c-violet'], warn: ['注意', 'c-yellow'] };
 const PIECE_TIPS = { gb: '铁路上可任意转弯，还能排除地雷', zd: '与任何棋子相碰都会同归于尽', sl: '全场最大；阵亡后我方军旗会被亮出', dl: '地雷不能移动', jq: '军旗不能移动，被夺即判负', any: '铁路上只能直行，公路每次走一格' };
@@ -953,8 +953,8 @@ function resetBattle(mid) {
   BT.mid = mid;
   BT.sel = null;
   BT.pop = null;
-  BT.duel = null;
   clearTimeout(BT.duelT);
+  hideDuel();
   BT.pending = false;
   BT.review = false;
   BT.anim = null;
@@ -1028,13 +1028,17 @@ function onCombat(ev) {
     else if (ev.res === 'both') { duel = { left: blue, right: red(my), title: '同归于尽', color: '#7A3FE0', sub: `我方${N}与来犯棋子一同阵亡` }; Sound.play('both'); }
   }
   if (!duel) return;
-  BT.duel = duel;
+  // 结果显示在棋盘外的提示条里，不遮挡棋盘
+  const bar = $('#duelBar');
+  const side = (x) => `<span class="pcm">${pieceBox(x.k, x.side, x.k ? 'front' : 'back', 'normal', '', 0.55)}</span>`;
+  bar.innerHTML = `<span class="pcs" aria-hidden="true">${side(duel.left)}<span class="vs">VS</span>${side(duel.right)}</span><span class="t" style="color:${duel.color}">${esc(duel.title)}</span><span class="s">${esc(duel.sub)}</span>`;
+  bar.hidden = false;
   clearTimeout(BT.duelT);
-  BT.duelT = setTimeout(() => {
-    BT.duel = null;
-    const d = $('#battleBoard .bd-duel');
-    if (d) d.remove();
-  }, 1900);
+  BT.duelT = setTimeout(hideDuel, 1900);
+}
+function hideDuel() {
+  const bar = $('#duelBar');
+  if (bar) { bar.hidden = true; bar.innerHTML = ''; }
 }
 
 function battleView() {
@@ -1050,7 +1054,7 @@ function battleView() {
     over = { tone: o, title: o === 'win' ? (r === 'flag' ? '夺得军旗！' : '胜利！') : o === 'lose' ? (r === 'flag' ? '军旗失守' : '惜败') : '和棋', text: R.reasonText(r, o) };
   }
   return {
-    occ, sel: BT.sel, lg, trail: SET.hints && v.phase === 'battle', hints: SET.hints, last: v.last, marks, pop: BT.pop, duel: BT.duel, over,
+    occ, sel: BT.sel, lg, trail: SET.hints && v.phase === 'battle', hints: SET.hints, last: v.last, marks, pop: BT.pop, over,
     interactive: myTurn() && !BT.pending, locked: v.phase === 'over', pending: BT.pending
   };
 }

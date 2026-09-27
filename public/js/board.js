@@ -266,11 +266,6 @@ export class Board {
         MARKS.map((m) => `<button type="button" data-act="mark" data-v="${m}" aria-pressed="${cur === m}" aria-label="标记为${m}" style="height:${cell}px">${m}</button>`).join('') +
         `<button type="button" class="clear" data-act="mark" data-v="" aria-label="清除标记" style="height:${cell}px">清除</button></div></div>`;
     }
-    if (v.duel) {
-      const d = v.duel, dw = Math.min(300, W - 16);
-      const side = (x) => `<span class="bd-big">${pieceBox(x.k, x.side, x.k ? 'front' : 'back', 'normal', '', 1.2)}</span>`;
-      html += `<div class="bd-duel" role="status" style="left:${R1(W / 2 - dw / 2)}px;top:${R1(Math.max(10, H * 0.44 - 100))}px;width:${dw}px"><div class="bd-duel-row">${side(d.left)}<span class="vs">VS</span>${side(d.right)}</div><div class="t" style="color:${d.color}">${esc(d.title)}</div><div class="s">${esc(d.sub)}</div></div>`;
-    }
     if (v.over) {
       const o = v.over;
       html += `<div class="bd-win"><div class="bd-win-card" role="status">${o.tone === 'lose' ? WHITE_FLAG : o.tone === 'draw' ? SCALE_ICON : FLAG_ICON}<div class="t ${o.tone}">${esc(o.title)}</div><div class="muted" style="font-size:15px">${esc(o.text)}</div><div class="btns"><button type="button" class="btn btn-primary" data-act="result">查看战绩</button><button type="button" class="btn" data-act="review">复盘棋盘</button></div></div></div>`;
