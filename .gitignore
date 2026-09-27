@@ -1,0 +1,7 @@
+node_modules/
+data/*.json
+data/*.tmp
+data/*.corrupt-*
+npm-debug.log*
+.DS_Store
+test-results/
